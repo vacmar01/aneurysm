@@ -104,7 +104,7 @@ export default function Home() {
         </p>
       </div>
       <Separator className="my-4" />
-      <div className="flex gap-16 px-8">
+      <div className="flex gap-16 px-8 max-w-[1200px] mx-auto">
         <div className="mt-4 w-[320px] border-r pr-8">
           <div className="sticky top-12 space-y-4 ">
             <h2 className="text-xl font-bold">UIATS Score</h2>
