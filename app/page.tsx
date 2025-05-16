@@ -31,7 +31,7 @@ interface ScoreCardProps {
   score: number
 }
 
-export function ScoreCard({ icon: Icon, title, score }: ScoreCardProps) {
+function ScoreCard({ icon: Icon, title, score }: ScoreCardProps) {
   return (
     <div className="p-4 border rounded-lg">
       <div className="flex items-center gap-2 mb-2 text-muted-foreground">
