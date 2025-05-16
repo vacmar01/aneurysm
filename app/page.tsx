@@ -100,7 +100,7 @@ export default function Home() {
           The UIATS score is a tool to help you determine the risk of aneurysms in your patients.
         </p>
         <p className="text-muted-foreground">
-          The UIATS score was developed by <a className="underline" href="https://www.ncbi.nlm.nih.gov/pubmed/26000000" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
+          The UIATS score was developed by <a className="underline" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
         </p>
       </div>
       <Separator className="my-4" />
