@@ -7,7 +7,7 @@ import { LucideIcon } from "lucide-react"
 
 
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+
 import {
   Select,
   SelectContent,
@@ -17,7 +17,7 @@ import {
   SelectGroup,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Button } from "@/components/ui/button"
+
 import { uiats } from "@/lib/uaits"
 import { Input } from "@/components/ui/input"
 
@@ -32,19 +32,31 @@ interface ScoreCardProps {
   score: number
 }
 
-function ScoreCard({ icon: Icon, title, score }: ScoreCardProps) {
+function ScoreCard({ icon: Icon, title, score, isEmpty }: ScoreCardProps & { isEmpty?: boolean }) {
   return (
     <div className="p-4 border rounded-lg">
       <div className="flex items-center gap-2 mb-2 text-muted-foreground">
         <Icon />
         <h2 className="text-md font-bold">{title}</h2>
       </div>
-      <p className="text-3xl font-bold">{score}</p>
+      <p className="text-3xl font-bold">{isEmpty ? "-" : score}</p>
     </div>
   )
 }
 
-function RecommendationCard({ intervention, conservative }: Scores) {
+function RecommendationCard({ intervention, conservative, isEmpty }: Scores & { isEmpty?: boolean }) {
+  if (isEmpty) {
+    return (
+      <div className="p-4 border rounded-lg">
+        <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+          <AlertCircle className="text-yellow-500" />
+          <h2 className="text-md font-bold">Recommendation</h2>
+        </div>
+        <p className="text-xl font-bold">-</p>
+      </div>
+    )
+  }
+
   const difference = Math.abs(intervention - conservative)
   let recommendation = "not definitive"
   let icon = AlertCircle
@@ -77,7 +89,7 @@ function RecommendationCard({ intervention, conservative }: Scores) {
 
 export default function Home() {
   const [formState, setFormState] = useState<Record<string, number>>({})
-  const [scores, setScores] = useState<Scores>({ intervention: 0, conservative: 5 }) // Conservative starts with 5 points
+  const [scores, setScores] = useState<Scores>({ intervention: 0, conservative: 5 }) // Restore initial conservative score of 5
 
   const handleSingleSelect = (uiatId: string, value: string) => {
     setFormState(prev => ({
@@ -105,7 +117,7 @@ export default function Home() {
   }
 
   const calculateScores = (state: Record<string, number>): Scores => {
-    const scores: Scores = { intervention: 0, conservative: 5 } // Conservative starts with 5 points
+    const scores: Scores = { intervention: 0, conservative: 5 } // Restore initial conservative score of 5
 
     uiats.forEach(uiat => {
       const value = state[uiat.id] || 0
@@ -115,9 +127,9 @@ export default function Home() {
         // Age contributes to both scores
         // For intervention: higher score for younger patients (as is)
         scores.intervention += value
-        // For conservative: higher score for older patients (inverse of intervention)
-        // Convert the value to conservative score (0->5, 1->4, 2->3, 3->2, 4->1, 5->0)
-        scores.conservative += (4 - value)
+        // For conservative: use mapping from intervention value to conservative score
+        const conservativeAgeMap: { [key: string]: number } = { 4: 0, 3: 1, 2: 3, 1: 4, 0: 5 }
+        scores.conservative += conservativeAgeMap[String(value)]
       } else if (uiat.id === "maximumDiameter") {
         // Calculate intervention score based on diameter
         let interventionScore = 0
@@ -170,7 +182,7 @@ export default function Home() {
               UIATS Score Calculator
             </h1>
             <p className="text-muted-foreground lg:text-lg text-balance">
-              The UIATS score is a tool to help you determine the risk of aneurysm rupture in your patients.
+              The UIATS score is a tool to help you determine the best treatment for your patients with unruptured intracranial aneurysms.
               It was developed by <a className="underline hover:text-foreground transition-colors" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
             </p>
           </div>
@@ -186,13 +198,19 @@ export default function Home() {
                 icon={Slice}
                 title="Intervention Score"
                 score={scores.intervention}
+                isEmpty={Object.keys(formState).length === 0}
               />
               <ScoreCard
                 icon={Tablets}
                 title="Conservative Score"
                 score={scores.conservative}
+                isEmpty={Object.keys(formState).length === 0}
               />
-              <RecommendationCard intervention={scores.intervention} conservative={scores.conservative} />
+              <RecommendationCard
+                intervention={scores.intervention}
+                conservative={scores.conservative}
+                isEmpty={Object.keys(formState).length === 0}
+              />
             </div>
           </div>
           <form className="space-y-6 py-4" onSubmit={handleSubmit}>
