@@ -161,85 +161,90 @@ export default function Home() {
   }
 
   return (
-    <div className="p-2">
-      <div className="flex flex-col justify-center items-center space-y-2 py-4">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-          UIATS Score Calculator
-        </h1>
-        <p className="text-muted-foreground mb-4">
-          The UIATS score is a tool to help you determine the risk of aneurysms in your patients.
-        </p>
-        <p className="text-muted-foreground">
-          The UIATS score was developed by <a className="underline" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
-        </p>
-      </div>
-      <Separator className="my-4" />
-      <div className="flex gap-16 px-8 max-w-[1200px] mx-auto">
-        <div className="mt-4 w-[320px] border-r pr-8">
-          <div className="sticky top-12 space-y-4 ">
-            <h2 className="text-xl font-bold">UIATS Score</h2>
-            <ScoreCard
-              icon={Slice}
-              title="Intervention Score"
-              score={scores.intervention}
-            />
-            <ScoreCard
-              icon={Tablets}
-              title="Conservative Score"
-              score={scores.conservative}
-            />
-            <RecommendationCard intervention={scores.intervention} conservative={scores.conservative} />
+    <div>
+      {/* hero */}
+      <div className="bg-gradient-to-br from-sky-50 via-violet-50 to-rose-50 border-b">
+        <div className="flex flex-col justify-center items-center space-y-2 py-16">
+          <div className="max-w-2xl text-center">
+            <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-6xl mb-6">
+              UIATS Score Calculator
+            </h1>
+            <p className="text-muted-foreground lg:text-lg text-balance">
+              The UIATS score is a tool to help you determine the risk of aneurysm rupture in your patients.
+              It was developed by <a className="underline" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
+            </p>
           </div>
         </div>
-        <form className="space-y-6 py-4" onSubmit={handleSubmit}>
-          {uiats.map((uiat) => (
-            <div key={uiat.id}>
-              <Label className="text-lg font-bold">{uiat.label}</Label>
-              <p className="text-sm text-muted-foreground mb-4">{uiat.description}</p>
-              {uiat.type === "single" ? (
-                <Select onValueChange={(value) => handleSingleSelect(uiat.id, value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {uiat.options.map((option) => (
-                        <SelectItem key={option.value} value={option.value.toString()}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              ) : uiat.type === "number" ? (
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    placeholder="Enter diameter in mm"
-                    onChange={(e) => handleNumberInput(uiat.id, e.target.value)}
-                    className="w-[180px]"
-                  />
-                  <span className="text-sm text-muted-foreground">mm</span>
-                </div>
-              ) : (
-                uiat.options.map((option, idx) => (
-                  <div key={`${uiat.id}-${idx}`} className="flex items-center gap-2">
-                    <Checkbox
-                      id={`${uiat.id}-${idx}`}
-                      onCheckedChange={(checked) =>
-                        handleMultipleSelect(uiat.id, option.value, checked as boolean)
-                      }
-                    />
-                    <label htmlFor={`${uiat.id}-${idx}`}>{option.label}</label>
-                  </div>
-                ))
-              )}
+      </div>
+      {/* Score Calculator */}
+      <div className="p-2">
+        <div className="flex gap-16 px-8 max-w-[1200px] mx-auto">
+          <div className="mt-4 w-[320px] border-r pr-8">
+            <div className="sticky top-12 space-y-4 ">
+              <h2 className="text-xl font-bold">UIATS Score</h2>
+              <ScoreCard
+                icon={Slice}
+                title="Intervention Score"
+                score={scores.intervention}
+              />
+              <ScoreCard
+                icon={Tablets}
+                title="Conservative Score"
+                score={scores.conservative}
+              />
+              <RecommendationCard intervention={scores.intervention} conservative={scores.conservative} />
             </div>
-          ))}
-        </form>
-      </div >
+          </div>
+          <form className="space-y-6 py-4" onSubmit={handleSubmit}>
+            {uiats.map((uiat) => (
+              <div key={uiat.id}>
+                <Label className="text-lg font-bold">{uiat.label}</Label>
+                <p className="text-sm text-muted-foreground mb-4">{uiat.description}</p>
+                {uiat.type === "single" ? (
+                  <Select onValueChange={(value) => handleSingleSelect(uiat.id, value)}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {uiat.options.map((option) => (
+                          <SelectItem key={option.value} value={option.value.toString()}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                ) : uiat.type === "number" ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      placeholder="Enter diameter in mm"
+                      onChange={(e) => handleNumberInput(uiat.id, e.target.value)}
+                      className="w-[180px]"
+                    />
+                    <span className="text-sm text-muted-foreground">mm</span>
+                  </div>
+                ) : (
+                  uiat.options.map((option, idx) => (
+                    <div key={`${uiat.id}-${idx}`} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`${uiat.id}-${idx}`}
+                        onCheckedChange={(checked) =>
+                          handleMultipleSelect(uiat.id, option.value, checked as boolean)
+                        }
+                      />
+                      <label htmlFor={`${uiat.id}-${idx}`}>{option.label}</label>
+                    </div>
+                  ))
+                )}
+              </div>
+            ))}
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
