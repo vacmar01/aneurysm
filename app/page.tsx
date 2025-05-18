@@ -68,7 +68,7 @@ function RecommendationCard({ intervention, conservative, isEmpty }: Scores & { 
       icon = Slice
       color = "text-red-500"
     } else {
-      recommendation = "conservative treatment"
+      recommendation = "conservative management"
       icon = Tablets
       color = "text-green-500"
     }
@@ -266,7 +266,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gradient-to-br from-sky-50 via-violet-50 to-rose-50 border-t mt-16">
         <div className="max-w-[1200px] mx-auto py-8 px-8 text-center text-muted-foreground">
-          <p>Created with ❤️ by Marius Vach - <a href="https://github.com/vacmar01/aneurysm" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">GitHub</a></p>
+          <p>Created with ❤️ by Dr. Marius Vach - <a href="https://github.com/vacmar01/aneurysm" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">GitHub</a></p>
         </div>
       </footer>
     </div>
