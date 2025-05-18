@@ -171,7 +171,7 @@ export default function Home() {
             </h1>
             <p className="text-muted-foreground lg:text-lg text-balance">
               The UIATS score is a tool to help you determine the risk of aneurysm rupture in your patients.
-              It was developed by <a className="underline" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
+              It was developed by <a className="underline hover:text-foreground transition-colors" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
             </p>
           </div>
         </div>
@@ -245,6 +245,12 @@ export default function Home() {
           </form>
         </div>
       </div>
+      {/* Footer */}
+      <footer className="bg-gradient-to-br from-sky-50 via-violet-50 to-rose-50 border-t mt-16">
+        <div className="max-w-[1200px] mx-auto py-8 px-8 text-center text-muted-foreground">
+          <p>Created with ❤️ by Marius Vach - <a href="https://github.com/vacmar01/aneurysm" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">GitHub</a></p>
+        </div>
+      </footer>
     </div>
   );
 }
