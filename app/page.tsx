@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 
-import { Tablets, Slice } from "lucide-react"
+import { Tablets, Slice, AlertCircle } from "lucide-react"
 
 import { LucideIcon } from "lucide-react"
 
@@ -19,6 +19,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { uiats } from "@/lib/uaits"
+import { Input } from "@/components/ui/input"
 
 type Scores = {
   intervention: number;
@@ -39,6 +40,37 @@ function ScoreCard({ icon: Icon, title, score }: ScoreCardProps) {
         <h2 className="text-md font-bold">{title}</h2>
       </div>
       <p className="text-3xl font-bold">{score}</p>
+    </div>
+  )
+}
+
+function RecommendationCard({ intervention, conservative }: Scores) {
+  const difference = Math.abs(intervention - conservative)
+  let recommendation = "not definitive"
+  let icon = AlertCircle
+  let color = "text-yellow-500"
+
+  if (difference >= 3) {
+    if (intervention > conservative) {
+      recommendation = "interventional treatment"
+      icon = Slice
+      color = "text-red-500"
+    } else {
+      recommendation = "conservative treatment"
+      icon = Tablets
+      color = "text-green-500"
+    }
+  }
+
+  const Icon = icon
+
+  return (
+    <div className="p-4 border rounded-lg">
+      <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+        <Icon className={color} />
+        <h2 className="text-md font-bold">Recommendation</h2>
+      </div>
+      <p className="text-xl font-bold capitalize">{recommendation}</p>
     </div>
   )
 }
@@ -64,15 +96,53 @@ export default function Home() {
     })
   }
 
+  const handleNumberInput = (uiatId: string, value: string) => {
+    const numValue = parseFloat(value) || 0
+    setFormState(prev => ({
+      ...prev,
+      [uiatId]: numValue
+    }))
+  }
+
   const calculateScores = (state: Record<string, number>): Scores => {
     const scores: Scores = { intervention: 0, conservative: 5 } // Conservative starts with 5 points
 
     uiats.forEach(uiat => {
       const value = state[uiat.id] || 0
-      if (uiat.pro === "intervention") {
+
+      // Special handling for age and maximumDiameter
+      if (uiat.id === "age") {
+        // Age contributes to both scores
+        // For intervention: higher score for younger patients (as is)
         scores.intervention += value
+        // For conservative: higher score for older patients (inverse of intervention)
+        // Convert the value to conservative score (0->5, 1->4, 2->3, 3->2, 4->1, 5->0)
+        scores.conservative += (4 - value)
+      } else if (uiat.id === "maximumDiameter") {
+        // Calculate intervention score based on diameter
+        let interventionScore = 0
+        if (value < 3.9) interventionScore = 0
+        else if (value <= 6.9) interventionScore = 1
+        else if (value <= 12.9) interventionScore = 2
+        else if (value <= 24.9) interventionScore = 3
+        else interventionScore = 4
+
+        // Calculate conservative score based on diameter
+        let conservativeScore = 0
+        if (value < 6) conservativeScore = 0
+        else if (value <= 10) conservativeScore = 1
+        else if (value <= 20) conservativeScore = 3
+        else conservativeScore = 5
+
+        scores.intervention += interventionScore
+        scores.conservative += conservativeScore
       } else {
-        scores.conservative += value
+        // Normal scoring for all other items
+        if (uiat.pro === "intervention") {
+          scores.intervention += value
+        } else {
+          scores.conservative += value
+        }
       }
     })
 
@@ -118,6 +188,7 @@ export default function Home() {
               title="Conservative Score"
               score={scores.conservative}
             />
+            <RecommendationCard intervention={scores.intervention} conservative={scores.conservative} />
           </div>
         </div>
         <form className="space-y-6 py-4" onSubmit={handleSubmit}>
@@ -140,10 +211,19 @@ export default function Home() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              ) : uiat.type === "number" ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    placeholder="Enter diameter in mm"
+                    onChange={(e) => handleNumberInput(uiat.id, e.target.value)}
+                    className="w-[180px]"
+                  />
+                  <span className="text-sm text-muted-foreground">mm</span>
+                </div>
               ) : (
-                null
-              )}
-              {uiat.type === "multiple" && (
                 uiat.options.map((option, idx) => (
                   <div key={`${uiat.id}-${idx}`} className="flex items-center gap-2">
                     <Checkbox
@@ -157,8 +237,7 @@ export default function Home() {
                 ))
               )}
             </div>
-          ))
-          }
+          ))}
         </form>
       </div >
     </div>
