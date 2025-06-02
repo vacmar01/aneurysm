@@ -45,7 +45,7 @@ function RecommendationCard({ intervention, conservative, isEmpty }: UiatsScores
       <div className="p-4 border rounded-lg">
         <div className="flex items-center gap-2 mb-2 text-muted-foreground">
           <AlertCircle className="text-yellow-500" />
-          <h2 className="text-md font-bold">Recommendation</h2>
+          <h2 className="text-md font-bold">UIATS Recommendation</h2>
         </div>
         <p className="text-xl font-bold">-</p>
       </div>
@@ -162,14 +162,14 @@ export default function Home() {
       {/* hero */}
       <div className="bg-gradient-to-br from-sky-50 via-violet-50 to-rose-50 border-b">
         <div className="flex flex-col justify-center items-center space-y-2 py-16">
-          <div className="max-w-2xl text-center">
+          <div className="max-w-3xl text-center">
             <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-6xl mb-6">
-              Score Calculator
+              Aneurysm Risk Calculator
             </h1>
             <p className="text-muted-foreground lg:text-lg text-balance">
-              Calculate UIATS and PHASES scores for unruptured intracranial aneurysms.
+              Calculate overall aneurysm risk, including treatment and conservative rupture risk, using UIATS and PHASES scores.
               UIATS by <a className="underline hover:text-foreground transition-colors" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015</a>.
-              PHASES details at <a className="underline hover:text-foreground transition-colors" href="https://radiopaedia.org/articles/phases-risk-prediction-score-1" target="_blank" rel="noopener noreferrer">Radiopaedia</a>.
+              PHASES by <a className="underline hover:text-foreground transition-colors" href="https://www.thelancet.com/journals/laneur/article/PIIS1474-4422(13)70263-1/abstract" target="_blank" rel="noopener noreferrer">Greving et al. 2014</a>.
             </p>
           </div>
         </div>
