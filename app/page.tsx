@@ -2,12 +2,9 @@
 import { useState, useEffect } from "react"
 
 import { Tablets, Slice, AlertCircle } from "lucide-react"
-
 import { LucideIcon } from "lucide-react"
 
-
 import { Label } from "@/components/ui/label"
-
 import {
   Select,
   SelectContent,
@@ -17,14 +14,12 @@ import {
   SelectGroup,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-
-import { uiats } from "@/lib/uaits"
 import { Input } from "@/components/ui/input"
 
-type Scores = {
-  intervention: number;
-  conservative: number;
-}
+import { formItems } from "../lib/form"
+import { calculatePhasesScore, PhasesScoreResult } from "../lib/phases"
+import { calculateUiatsScores, UiatsScores } from "../lib/uiats"
+import { FormState } from "../lib/types"
 
 interface ScoreCardProps {
   icon: LucideIcon
@@ -44,7 +39,7 @@ function ScoreCard({ icon: Icon, title, score, isEmpty }: ScoreCardProps & { isE
   )
 }
 
-function RecommendationCard({ intervention, conservative, isEmpty }: Scores & { isEmpty?: boolean }) {
+function RecommendationCard({ intervention, conservative, isEmpty }: UiatsScores & { isEmpty?: boolean }) {
   if (isEmpty) {
     return (
       <div className="p-4 border rounded-lg">
@@ -59,7 +54,7 @@ function RecommendationCard({ intervention, conservative, isEmpty }: Scores & { 
 
   const difference = Math.abs(intervention - conservative)
   let recommendation = "not definitive"
-  let icon = AlertCircle
+  let icon: LucideIcon = AlertCircle
   let color = "text-yellow-500"
 
   if (difference >= 3) {
@@ -74,12 +69,12 @@ function RecommendationCard({ intervention, conservative, isEmpty }: Scores & { 
     }
   }
 
-  const Icon = icon
+  const IconComponent = icon
 
   return (
     <div className="p-4 border rounded-lg">
       <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-        <Icon className={color} />
+        <IconComponent className={color} />
         <h2 className="text-md font-bold">Recommendation</h2>
       </div>
       <p className="text-xl font-bold capitalize">{recommendation}</p>
@@ -87,89 +82,79 @@ function RecommendationCard({ intervention, conservative, isEmpty }: Scores & { 
   )
 }
 
+function PhasesScoreCard({ formState, isEmpty }: { formState: FormState, isEmpty: boolean }) {
+  if (isEmpty) {
+    return (
+      <div className="p-4 border rounded-lg">
+        <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+          <AlertCircle className="text-yellow-500" />
+          <h2 className="text-md font-bold">PHASES Score</h2>
+        </div>
+        <p className="text-xl font-bold">-</p>
+      </div>
+    )
+  }
+  const { score, risk } = calculatePhasesScore(formState)
+  return (
+    <div className="p-4 border rounded-lg">
+      <div className="flex items-center gap-2 mb-2 text-muted-foreground">
+        <AlertCircle className="text-blue-500" />
+        <h2 className="text-md font-bold">PHASES Score</h2>
+      </div>
+      <p className="text-3xl font-bold">{score}</p>
+      <p className="text-md mt-1">5-year rupture risk: <span className="font-semibold">{risk}</span></p>
+    </div>
+  )
+}
+
 export default function Home() {
-  const [formState, setFormState] = useState<Record<string, number>>({})
-  const [scores, setScores] = useState<Scores>({ intervention: 0, conservative: 5 }) // Restore initial conservative score of 5
+  const [formState, setFormState] = useState<FormState>({})
+  const [uiatsScores, setUiatsScores] = useState<UiatsScores>({ intervention: 0, conservative: 5 })
+  const [phasesScoreResult, setPhasesScoreResult] = useState<PhasesScoreResult>({ score: 0, risk: "-" })
 
-  const handleSingleSelect = (uiatId: string, value: string) => {
+  const handleSingleSelect = (itemId: string, value: string) => {
     setFormState(prev => ({
       ...prev,
-      [uiatId]: parseInt(value)
+      [itemId]: value
     }))
   }
 
-  const handleMultipleSelect = (uiatId: string, optionValue: number, checked: boolean) => {
+  const handleMultipleSelect = (itemId: string, optionValue: string, checked: boolean) => {
     setFormState(prev => {
-      const currentValue = prev[uiatId] || 0
-      return {
-        ...prev,
-        [uiatId]: checked ? currentValue + optionValue : currentValue - optionValue
-      }
-    })
-  }
-
-  const handleNumberInput = (uiatId: string, value: string) => {
-    const numValue = parseFloat(value) || 0
-    setFormState(prev => ({
-      ...prev,
-      [uiatId]: numValue
-    }))
-  }
-
-  const calculateScores = (state: Record<string, number>): Scores => {
-    const scores: Scores = { intervention: 0, conservative: 5 } // Restore initial conservative score of 5
-
-    uiats.forEach(uiat => {
-      const value = state[uiat.id] || 0
-
-      // Special handling for age and maximumDiameter
-      if (uiat.id === "age") {
-        // Age contributes to both scores
-        // For intervention: higher score for younger patients (as is)
-        scores.intervention += value
-        // For conservative: use mapping from intervention value to conservative score
-        const conservativeAgeMap: { [key: string]: number } = { 4: 0, 3: 1, 2: 3, 1: 4, 0: 5 }
-        scores.conservative += conservativeAgeMap[String(value)]
-      } else if (uiat.id === "maximumDiameter") {
-        // Calculate intervention score based on diameter
-        let interventionScore = 0
-        if (value < 3.9) interventionScore = 0
-        else if (value <= 6.9) interventionScore = 1
-        else if (value <= 12.9) interventionScore = 2
-        else if (value <= 24.9) interventionScore = 3
-        else interventionScore = 4
-
-        // Calculate conservative score based on diameter
-        let conservativeScore = 0
-        if (value < 6) conservativeScore = 0
-        else if (value <= 10) conservativeScore = 1
-        else if (value <= 20) conservativeScore = 3
-        else conservativeScore = 5
-
-        scores.intervention += interventionScore
-        scores.conservative += conservativeScore
+      const currentSelection = (prev[itemId] as string[] | undefined) || []
+      if (checked) {
+        return {
+          ...prev,
+          [itemId]: [...currentSelection, optionValue]
+        }
       } else {
-        // Normal scoring for all other items
-        if (uiat.pro === "intervention") {
-          scores.intervention += value
-        } else {
-          scores.conservative += value
+        return {
+          ...prev,
+          [itemId]: currentSelection.filter(v => v !== optionValue)
         }
       }
     })
+  }
 
-    return scores
+  const handleNumberInput = (itemId: string, value: string) => {
+    const numValue = parseFloat(value)
+    setFormState(prev => ({
+      ...prev,
+      [itemId]: isNaN(numValue) ? undefined : numValue
+    }))
   }
 
   // Update scores whenever form state changes
   useEffect(() => {
-    setScores(calculateScores(formState))
+    setUiatsScores(calculateUiatsScores(formState))
+    setPhasesScoreResult(calculatePhasesScore(formState))
   }, [formState])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Form State:', formState)
-    console.log('Scores:', scores)
+    console.log('UIATS Scores:', uiatsScores)
+    console.log('PHASES Score:', phasesScoreResult)
   }
 
   return (
@@ -179,11 +164,12 @@ export default function Home() {
         <div className="flex flex-col justify-center items-center space-y-2 py-16">
           <div className="max-w-2xl text-center">
             <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-6xl mb-6">
-              UIATS Score Calculator
+              Score Calculator
             </h1>
             <p className="text-muted-foreground lg:text-lg text-balance">
-              The UIATS score is a tool to help you determine the best treatment for your patients with unruptured intracranial aneurysms.
-              It was developed by <a className="underline hover:text-foreground transition-colors" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015 </a>
+              Calculate UIATS and PHASES scores for unruptured intracranial aneurysms.
+              UIATS by <a className="underline hover:text-foreground transition-colors" href="https://www.ncbi.nlm.nih.gov/pubmed/26276380" target="_blank" rel="noopener noreferrer">Etminan et al. 2015</a>.
+              PHASES details at <a className="underline hover:text-foreground transition-colors" href="https://radiopaedia.org/articles/phases-risk-prediction-score-1" target="_blank" rel="noopener noreferrer">Radiopaedia</a>.
             </p>
           </div>
         </div>
@@ -193,68 +179,74 @@ export default function Home() {
         <div className="flex gap-16 px-8 max-w-[1200px] mx-auto">
           <div className="mt-4 w-[320px] border-r pr-8">
             <div className="sticky top-12 space-y-4 ">
-              <h2 className="text-xl font-bold">UIATS Score</h2>
+              <h2 className="text-xl font-bold">Scores</h2>
               <ScoreCard
                 icon={Slice}
-                title="Intervention Score"
-                score={scores.intervention}
+                title="UIATS Intervention"
+                score={uiatsScores.intervention}
                 isEmpty={Object.keys(formState).length === 0}
               />
               <ScoreCard
                 icon={Tablets}
-                title="Conservative Score"
-                score={scores.conservative}
+                title="UIATS Conservative"
+                score={uiatsScores.conservative}
                 isEmpty={Object.keys(formState).length === 0}
               />
               <RecommendationCard
-                intervention={scores.intervention}
-                conservative={scores.conservative}
+                intervention={uiatsScores.intervention}
+                conservative={uiatsScores.conservative}
+                isEmpty={Object.keys(formState).length === 0}
+              />
+              <PhasesScoreCard
+                formState={formState}
                 isEmpty={Object.keys(formState).length === 0}
               />
             </div>
           </div>
           <form className="space-y-6 py-4" onSubmit={handleSubmit}>
-            {uiats.map((uiat) => (
-              <div key={uiat.id}>
-                <Label className="text-lg font-bold">{uiat.label}</Label>
-                <p className="text-sm text-muted-foreground mb-4">{uiat.description}</p>
-                {uiat.type === "single" ? (
-                  <Select onValueChange={(value) => handleSingleSelect(uiat.id, value)}>
-                    <SelectTrigger className="w-[180px]">
+            {formItems.map((item) => (
+              <div key={item.id}>
+                <Label className="text-lg font-bold">{item.label}</Label>
+                <p className="text-sm text-muted-foreground mb-4">{item.description}</p>
+                {item.type === "single" ? (
+                  <Select onValueChange={(value) => handleSingleSelect(item.id, value)} value={formState[item.id] as string || ""}>
+                    <SelectTrigger className="w-[280px]">
                       <SelectValue placeholder="Select an option" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {uiat.options.map((option) => (
-                          <SelectItem key={option.value} value={option.value.toString()}>
+                        {item.options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
                         ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                ) : uiat.type === "number" ? (
+                ) : item.type === "number" ? (
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
                       step="0.1"
                       min="0"
-                      placeholder="Enter diameter in mm"
-                      onChange={(e) => handleNumberInput(uiat.id, e.target.value)}
+                      placeholder={`Enter ${item.label.toLowerCase()}`}
+                      onChange={(e) => handleNumberInput(item.id, e.target.value)}
+                      value={formState[item.id] as number || ""}
                       className="w-[180px]"
                     />
-                    <span className="text-sm text-muted-foreground">mm</span>
+                    {item.id === "maximumDiameter" && <span className="text-sm text-muted-foreground">mm</span>}
                   </div>
                 ) : (
-                  uiat.options.map((option, idx) => (
-                    <div key={`${uiat.id}-${idx}`} className="flex items-center gap-2">
+                  item.options.map((option) => (
+                    <div key={`${item.id}-${option.value}`} className="flex items-center gap-2">
                       <Checkbox
-                        id={`${uiat.id}-${idx}`}
+                        id={`${item.id}-${option.value}`}
                         onCheckedChange={(checked) =>
-                          handleMultipleSelect(uiat.id, option.value, checked as boolean)
+                          handleMultipleSelect(item.id, option.value, checked as boolean)
                         }
+                        checked={(formState[item.id] as string[] | undefined)?.includes(option.value) || false}
                       />
-                      <label htmlFor={`${uiat.id}-${idx}`}>{option.label}</label>
+                      <label htmlFor={`${item.id}-${option.value}`}>{option.label}</label>
                     </div>
                   ))
                 )}
