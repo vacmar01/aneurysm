@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "mise exec node@22 -- next dev --turbopack",
+    "build": "mise exec node@22 -- next build",
+    "start": "mise exec node@22 -- next start",
+    "lint": "mise exec node@22 -- next lint",
+    "test": "mise exec node@22 -- vitest run",
+    "test:watch": "mise exec node@22 -- vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -33,6 +35,7 @@
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.2.9",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
