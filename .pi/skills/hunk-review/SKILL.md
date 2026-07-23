@@ -1,0 +1,1 @@
+/home/marius/.local/share/mise/installs/node/25.9.0/lib/node_modules/hunkdiff/skills/hunk-review/SKILL.md
