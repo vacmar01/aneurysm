@@ -17,16 +17,20 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   const scores: UiatsScores = { intervention: 0, conservative: 5 };
 
   // --- Age --- (ID: "age")
-  const ageValue = formState.age as string | undefined;
-  if (ageValue) {
-    const ageMapIntervention: Record<string, number> = {
-      "<40": 4, "40-60": 3, "61-70": 2, "71-80": 1, ">80": 0,
-    };
-    const ageMapConservative: Record<string, number> = {
-      "<40": 0, "40-60": 1, "61-70": 3, "71-80": 4, ">80": 5,
-    };
-    scores.intervention += ageMapIntervention[ageValue] || 0;
-    scores.conservative += ageMapConservative[ageValue] || 0;
+  const ageValue = formState.age as number;
+  if (ageValue < 40) {
+    scores.intervention += 4;
+  } else if (ageValue <= 60) {
+    scores.intervention += 3;
+    scores.conservative += 1;
+  } else if (ageValue <= 70) {
+    scores.intervention += 2;
+    scores.conservative += 3;
+  } else if (ageValue <= 80) {
+    scores.intervention += 1;
+    scores.conservative += 4;
+  } else if (ageValue > 80) {
+    scores.conservative += 5;
   }
 
   // --- Risk Factors --- (ID: "riskFactors", Pro: Intervention)

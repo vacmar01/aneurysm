@@ -8,7 +8,7 @@ export type FormItem = {
     label: string;
     description: string;
     type: "single" | "multiple" | "number";
-    options: FormOption[];
+    options?: FormOption[];
 }
 
 // --- Form Item Definitions ---
@@ -16,15 +16,8 @@ export type FormItem = {
 export const age: FormItem = {
     id: "age",
     label: "Age",
-    description: "The patient's age",
-    type: "single",
-    options: [
-        { label: "< 40 years", value: "<40" },
-        { label: "40-60 years", value: "40-60" },
-        { label: "61-70 years", value: "61-70" },
-        { label: "71-80 years", value: "71-80" },
-        { label: "> 80 years", value: ">80" }
-    ]
+    description: "The patient's age in years",
+    type: "number",
 }
 
 export const population: FormItem = {

@@ -36,8 +36,8 @@ export function calculatePhasesScore(formState: FormState): PhasesScoreResult {
   }
 
   // 3. Age (A) - >=70 years: 1 point
-  const ageValue = formState.age as string | undefined;
-  if (ageValue === "71-80" || ageValue === ">80") {
+  const ageValue = formState.age as number;
+  if (ageValue >= 70) {
     score += 1;
   }
 

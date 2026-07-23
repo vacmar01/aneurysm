@@ -12,12 +12,15 @@ describe("calculateUiatsScores", () => {
 
   describe("age", () => {
     it.each([
-      ["<40", 4, 5],
-      ["40-60", 3, 6],
-      ["61-70", 2, 8],
-      ["71-80", 1, 9],
-      [">80", 0, 10],
-    ])("scores %s as %s intervention and %s conservative points", (age, intervention, conservative) => {
+      [39, 4, 5],
+      [40, 3, 6],
+      [60, 3, 6],
+      [61, 2, 8],
+      [70, 2, 8],
+      [71, 1, 9],
+      [80, 1, 9],
+      [81, 0, 10],
+    ])("scores age %s as %s intervention and %s conservative points", (age, intervention, conservative) => {
       expect(calculateUiatsScores({ age })).toEqual({ intervention, conservative })
     })
   })
@@ -137,7 +140,7 @@ describe("calculateUiatsScores", () => {
 
   it("adds points across independent fields", () => {
     expect(calculateUiatsScores({
-      age: "40-60",
+      age: 40,
       population: "japanese",
       riskFactors: ["hypertension"],
       symptoms: ["cn_palsy"],

@@ -215,7 +215,7 @@ export default function Home() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {item.options.map((option) => (
+                        {item.options?.map((option) => (
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
@@ -227,17 +227,17 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
-                      step="0.1"
-                      min="0"
+                      step={item.id === "age" ? "1" : "0.1"}
+                      min={item.id === "age" ? "18" : "0"}
                       placeholder={`Enter ${item.label.toLowerCase()}`}
                       onChange={(e) => handleNumberInput(item.id, e.target.value)}
-                      value={formState[item.id] as number || ""}
+                      value={formState[item.id] as number ?? ""}
                       className="w-[180px]"
                     />
                     {item.id === "maximumDiameter" && <span className="text-sm text-muted-foreground">mm</span>}
                   </div>
                 ) : (
-                  item.options.map((option) => (
+                  item.options?.map((option) => (
                     <div key={`${item.id}-${option.value}`} className="flex items-center gap-2">
                       <Checkbox
                         id={`${item.id}-${option.value}`}
