@@ -20,23 +20,25 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   const ageValue = formState.age as string | undefined;
   if (ageValue) {
     const ageMapIntervention: Record<string, number> = {
-      "<40": 4, "41-60": 3, "61-70": 2, "71-80": 1, ">80": 0,
+      "<40": 4, "40-60": 3, "61-70": 2, "71-80": 1, ">80": 0,
     };
     const ageMapConservative: Record<string, number> = {
-      "<40": 0, "41-60": 1, "61-70": 3, "71-80": 4, ">80": 5,
+      "<40": 0, "40-60": 1, "61-70": 3, "71-80": 4, ">80": 5,
     };
     scores.intervention += ageMapIntervention[ageValue] || 0;
     scores.conservative += ageMapConservative[ageValue] || 0;
   }
 
   // --- Risk Factors --- (ID: "riskFactors", Pro: Intervention)
+  const selectedPopulation = formState.population as string | undefined;
+  if (selectedPopulation === "japanese" || selectedPopulation === "finnish" || selectedPopulation === "inuit") {
+    scores.intervention += 2;
+  }
+
   const selectedRiskFactors = getSelectedValues(formState.riskFactors);
   const riskFactorPoints: Record<string, number> = {
     "sah": 4,
     "family": 3,
-    "japanese": 2,
-    "finnish": 2,
-    "inuit": 2,
     "smoker": 3,
     "hypertension": 2,
     "pkd": 2,
@@ -87,7 +89,7 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   const diameter = formState.maximumDiameter as number | undefined;
   if (diameter !== undefined) {
     let interventionScore = 0;
-    if (diameter < 3.9) interventionScore = 0;
+    if (diameter <= 3.9) interventionScore = 0;
     else if (diameter <= 6.9) interventionScore = 1;
     else if (diameter <= 12.9) interventionScore = 2;
     else if (diameter <= 24.9) interventionScore = 3;

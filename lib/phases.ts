@@ -19,12 +19,13 @@ function getSelectedRiskFactors(formStateValue: string | string[] | number | und
 export function calculatePhasesScore(formState: FormState): PhasesScoreResult {
   let score = 0;
   const selectedRiskFactors = getSelectedRiskFactors(formState.riskFactors);
+  const populationValue = formState.population as string | undefined;
 
   // 1. Population (P)
   // PHASES: Japanese +3, Finnish +5. Others 0.
-  if (selectedRiskFactors.includes("japanese")) {
+  if (populationValue === "japanese") {
     score += 3;
-  } else if (selectedRiskFactors.includes("finnish")) {
+  } else if (populationValue === "finnish") {
     score += 5;
   }
   // "na_eur_non_finnish" or unspecified = 0 points for population.

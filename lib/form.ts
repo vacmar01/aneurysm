@@ -20,11 +20,24 @@ export const age: FormItem = {
     type: "single",
     options: [
         { label: "< 40 years", value: "<40" },
-        { label: "41-60 years", value: "41-60" },
+        { label: "40-60 years", value: "40-60" },
         { label: "61-70 years", value: "61-70" },
         { label: "71-80 years", value: "71-80" },
         { label: "> 80 years", value: ">80" }
     ]
+}
+
+export const population: FormItem = {
+    id: "population",
+    label: "Population",
+    description: "The patient's geographic population or ethnic background",
+    type: "single",
+    options: [
+        { label: "North American or European (non-Finnish)", value: "na_eur_non_finnish" },
+        { label: "Japanese", value: "japanese" },
+        { label: "Finnish", value: "finnish" },
+        { label: "Inuit", value: "inuit" },
+    ],
 }
 
 export const riskFactors: FormItem = {
@@ -35,10 +48,6 @@ export const riskFactors: FormItem = {
     options: [
         { label: "Previous subarachnoid hemorrhage (2nd aneurysm)", value: "sah" },
         { label: "Family disposition", value: "family" },
-        { label: "North American or European (non-Finnish)", value: "na_eur_non_finnish" },
-        { label: "Japanese", value: "japanese" },
-        { label: "Finnish", value: "finnish" },
-        { label: "Inuit", value: "inuit" },
         { label: "Smoker", value: "smoker" },
         { label: "Hypertension (systolic blood pressure > 140 mmHg)", value: "hypertension" },
         { label: "Polycystic kidney disease", value: "pkd" },
@@ -110,7 +119,7 @@ export const morphology: FormItem = {
     type: "multiple",
     options: [
         { label: "Irregular or lobulated", value: "irregular_lobulated" },
-        { label: "Height/Width ratio > 1.6", value: "hw_ratio_gt_1.6" },
+        { label: "Size ratio > 3 or aspect ratio > 1.6", value: "hw_ratio_gt_1.6" },
     ],
 }
 
@@ -158,6 +167,7 @@ export const aneurysmComplexity: FormItem = {
 
 export const formItems: FormItem[] = [
     age,
+    population,
     riskFactors,
     symptoms,
     otherUiatsFactors, // Renamed from 'other'
