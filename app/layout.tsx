@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://aneurysm.mariusvach.com"),
   title: "Aneurysm Risk Calculator",
   description: "Calculate overall aneurysm risk (treatment and conservative rupture risk) with UIATS and PHASES scores.",
   openGraph: {
