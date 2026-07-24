@@ -1,5 +1,5 @@
 "use client"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { Tablets, Slice, AlertCircle, Info, ArrowDown } from "lucide-react"
 import { LucideIcon } from "lucide-react"
@@ -135,6 +135,8 @@ function ScoreSummary({ formState, uiatsScores, className = "", cardsClassName =
 
 export default function Home() {
   const [formState, setFormState] = useState<FormState>({})
+  const [resultsVisible, setResultsVisible] = useState(false)
+  const resultsRef = useRef<HTMLElement>(null)
   const uiatsScores = useMemo(() => calculateUiatsScores(formState), [formState])
   const phasesScoreResult = useMemo(() => calculatePhasesScore(formState), [formState])
 
@@ -176,6 +178,19 @@ export default function Home() {
     console.log('UIATS Scores:', uiatsScores)
     console.log('PHASES Score:', phasesScoreResult)
   }
+
+  useEffect(() => {
+    const results = resultsRef.current
+    if (!results) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setResultsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    )
+
+    observer.observe(results)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <div>
@@ -270,7 +285,7 @@ export default function Home() {
               </div>
             ))}
           </form>
-          <section id="results" className="lg:hidden scroll-mt-6">
+          <section ref={resultsRef} id="results" className="lg:hidden scroll-mt-6">
             <ScoreSummary
               formState={formState}
               uiatsScores={uiatsScores}
@@ -279,13 +294,15 @@ export default function Home() {
           </section>
         </div>
       </div>
-      <a
-        href="#results"
-        className="lg:hidden fixed bottom-4 right-4 z-10 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
+      {!resultsVisible && (
+        <a
+          href="#results"
+          className="lg:hidden fixed bottom-4 right-4 z-10 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
         View results
-        <ArrowDown className="size-4" />
-      </a>
+          <ArrowDown className="size-4" />
+        </a>
+      )}
       {/* Footer */}
       <footer className="bg-gradient-to-br from-sky-50 via-violet-50 to-rose-50 border-t mt-16">
         <div className="max-w-[1200px] mx-auto py-8 px-8 text-center text-muted-foreground">
