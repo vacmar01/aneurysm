@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "mise exec node@22 -- next dev --turbopack",
-    "build": "mise exec node@22 -- next build",
-    "start": "mise exec node@22 -- next start",
-    "lint": "mise exec node@22 -- next lint",
-    "test": "mise exec node@22 -- vitest run",
-    "test:watch": "mise exec node@22 -- vitest"
+    "dev": "mise exec node@25 -- next dev --turbopack",
+    "build": "mise exec node@25 -- next build",
+    "start": "mise exec node@25 -- next start",
+    "lint": "mise exec node@25 -- eslint .",
+    "test": "mise exec node@25 -- vitest run",
+    "test:watch": "mise exec node@25 -- vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -21,7 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.510.0",
-    "next": "15.3.2",
+    "next": "16.2.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.3",
@@ -33,6 +33,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.2.11",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.2.9",
     "typescript": "^5",

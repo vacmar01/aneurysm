@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useMemo, useState } from "react"
 
 import { Tablets, Slice, AlertCircle } from "lucide-react"
 import { LucideIcon } from "lucide-react"
@@ -109,8 +109,8 @@ function PhasesScoreCard({ formState, isEmpty }: { formState: FormState, isEmpty
 
 export default function Home() {
   const [formState, setFormState] = useState<FormState>({})
-  const [uiatsScores, setUiatsScores] = useState<UiatsScores>({ intervention: 0, conservative: 5 })
-  const [phasesScoreResult, setPhasesScoreResult] = useState<PhasesScoreResult>({ score: 0, risk: "-" })
+  const uiatsScores = useMemo(() => calculateUiatsScores(formState), [formState])
+  const phasesScoreResult = useMemo(() => calculatePhasesScore(formState), [formState])
 
   const handleSingleSelect = (itemId: string, value: string) => {
     setFormState(prev => ({
@@ -143,12 +143,6 @@ export default function Home() {
       [itemId]: isNaN(numValue) ? undefined : numValue
     }))
   }
-
-  // Update scores whenever form state changes
-  useEffect(() => {
-    setUiatsScores(calculateUiatsScores(formState))
-    setPhasesScoreResult(calculatePhasesScore(formState))
-  }, [formState])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
