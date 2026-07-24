@@ -7,6 +7,7 @@ export type FormItem = {
     id: string;
     label: string;
     description: string;
+    tooltip?: string;
     type: "single" | "multiple" | "number";
     options?: FormOption[];
 }
@@ -151,6 +152,7 @@ export const aneurysmComplexity: FormItem = {
     id: "aneurysmComplexity",
     label: "Aneurysm Complexity",
     description: "Assessment of aneurysm treatment complexity",
+    tooltip: "In UIATS, an aneurysm of any size is complex if it has at least one of these features: a neck wider than the parent artery, significant lobulations, calcifications, intra-aneurysm thrombus, proximal vessel tortuosity or stenosis, a branch artery incorporated into the neck or sac, or a diameter smaller than 3 mm.",
     type: "single",
     options: [
         { label: "High complexity", value: "high_complexity" },

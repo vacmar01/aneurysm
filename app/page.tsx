@@ -1,7 +1,7 @@
 "use client"
 import { useMemo, useState } from "react"
 
-import { Tablets, Slice, AlertCircle } from "lucide-react"
+import { Tablets, Slice, AlertCircle, Info } from "lucide-react"
 import { LucideIcon } from "lucide-react"
 
 import { Label } from "@/components/ui/label"
@@ -15,6 +15,11 @@ import {
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 import { formItems } from "../lib/form"
 import { calculatePhasesScore, PhasesScoreResult } from "../lib/phases"
@@ -200,7 +205,25 @@ export default function Home() {
           <form className="space-y-6 py-4" onSubmit={handleSubmit}>
             {formItems.map((item) => (
               <div key={item.id}>
-                <Label className="text-lg font-bold">{item.label}</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-lg font-bold">{item.label}</Label>
+                  {item.tooltip && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label={`More information about ${item.label}`}
+                          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-full outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        >
+                          <Info className="size-4" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="leading-relaxed">
+                        {item.tooltip}
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground mb-4">{item.description}</p>
                 {item.type === "single" ? (
                   <Select onValueChange={(value) => handleSingleSelect(item.id, value)} value={formState[item.id] as string || ""}>
