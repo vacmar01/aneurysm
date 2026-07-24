@@ -1,4 +1,4 @@
-// PHASES score calculation based on https://radiopaedia.org/articles/phases-risk-prediction-score-1
+// PHASES score calculation based on https://flexikon.doccheck.com/de/PHASES-Score
 // Accepts the formState (Record<string, any>) and returns { score: number, risk: string }
 
 import { FormState } from "./types"; // Updated path to FormState
@@ -71,13 +71,22 @@ export function calculatePhasesScore(formState: FormState): PhasesScoreResult {
   }
   // "ica" or unspecified = 0 points for site automatically if not matched above.
 
-  // Determine 5-year rupture risk based on total PHASES score
-  let risk = "<0.4% (very low)"; // Score 0-2
-  if (score >= 3 && score <= 4) risk = "1.5% (low)";
-  else if (score >= 5 && score <= 6) risk = "3.2% (moderate)";
-  else if (score >= 7 && score <= 8) risk = "6.4% (high)";
-  else if (score >= 9 && score <= 10) risk = "12.3% (very high)";
-  else if (score >= 11) risk = "17.8% (extremely high)"; // Score 11+
+  // Determine absolute 5-year rupture risk based on total PHASES score.
+  const riskByScore: Record<number, string> = {
+    0: "0.4%",
+    1: "0.4%",
+    2: "0.4%",
+    3: "0.7%",
+    4: "0.9%",
+    5: "1.3%",
+    6: "1.7%",
+    7: "2.4%",
+    8: "3.2%",
+    9: "4.3%",
+    10: "5.3%",
+    11: "7.2%",
+  };
+  const risk = riskByScore[score] ?? "17.8%";
 
   return { score, risk };
 } 
