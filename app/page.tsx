@@ -1,7 +1,7 @@
 "use client"
 import { useMemo, useState } from "react"
 
-import { Tablets, Slice, AlertCircle, Info } from "lucide-react"
+import { Tablets, Slice, AlertCircle, Info, ArrowDown } from "lucide-react"
 import { LucideIcon } from "lucide-react"
 
 import { Label } from "@/components/ui/label"
@@ -112,6 +112,27 @@ function PhasesScoreCard({ formState, isEmpty }: { formState: FormState, isEmpty
   )
 }
 
+function ScoreSummary({ formState, uiatsScores, className = "", cardsClassName = "space-y-4" }: {
+  formState: FormState
+  uiatsScores: UiatsScores
+  className?: string
+  cardsClassName?: string
+}) {
+  const isEmpty = Object.keys(formState).length === 0
+
+  return (
+    <div className={className}>
+      <h2 className="text-xl font-bold mb-4">Scores</h2>
+      <div className={cardsClassName}>
+        <ScoreCard icon={Slice} title="UIATS Intervention" score={uiatsScores.intervention} isEmpty={isEmpty} />
+        <ScoreCard icon={Tablets} title="UIATS Conservative" score={uiatsScores.conservative} isEmpty={isEmpty} />
+        <RecommendationCard intervention={uiatsScores.intervention} conservative={uiatsScores.conservative} isEmpty={isEmpty} />
+        <PhasesScoreCard formState={formState} isEmpty={isEmpty} />
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [formState, setFormState] = useState<FormState>({})
   const uiatsScores = useMemo(() => calculateUiatsScores(formState), [formState])
@@ -174,35 +195,14 @@ export default function Home() {
         </div>
       </div>
       {/* Score Calculator */}
-      <div className="p-2">
-        <div className="flex gap-16 px-8 max-w-[1200px] mx-auto">
-          <div className="mt-4 w-[320px] border-r pr-8">
-            <div className="sticky top-12 space-y-4 ">
-              <h2 className="text-xl font-bold">Scores</h2>
-              <ScoreCard
-                icon={Slice}
-                title="UIATS Intervention"
-                score={uiatsScores.intervention}
-                isEmpty={Object.keys(formState).length === 0}
-              />
-              <ScoreCard
-                icon={Tablets}
-                title="UIATS Conservative"
-                score={uiatsScores.conservative}
-                isEmpty={Object.keys(formState).length === 0}
-              />
-              <RecommendationCard
-                intervention={uiatsScores.intervention}
-                conservative={uiatsScores.conservative}
-                isEmpty={Object.keys(formState).length === 0}
-              />
-              <PhasesScoreCard
-                formState={formState}
-                isEmpty={Object.keys(formState).length === 0}
-              />
+      <div className="p-2 pb-20 lg:pb-2">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 px-4 sm:px-8 max-w-[1200px] mx-auto">
+          <aside className="hidden lg:block mt-4 w-[320px] shrink-0 border-r pr-8">
+            <div className="sticky top-12">
+              <ScoreSummary formState={formState} uiatsScores={uiatsScores} />
             </div>
-          </div>
-          <form className="space-y-6 py-4" onSubmit={handleSubmit}>
+          </aside>
+          <form className="min-w-0 flex-1 space-y-6 py-4" onSubmit={handleSubmit}>
             {formItems.map((item) => (
               <div key={item.id}>
                 <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground mb-4">{item.description}</p>
                 {item.type === "single" ? (
                   <Select onValueChange={(value) => handleSingleSelect(item.id, value)} value={formState[item.id] as string || ""}>
-                    <SelectTrigger className="w-[280px]">
+                    <SelectTrigger className="w-full sm:w-[280px]">
                       <SelectValue placeholder="Select an option" />
                     </SelectTrigger>
                     <SelectContent>
@@ -249,7 +249,7 @@ export default function Home() {
                       placeholder={`Enter ${item.label.toLowerCase()}`}
                       onChange={(e) => handleNumberInput(item.id, e.target.value)}
                       value={formState[item.id] as number ?? ""}
-                      className="w-[180px]"
+                      className="w-full sm:w-[180px]"
                     />
                     {item.id === "maximumDiameter" && <span className="text-sm text-muted-foreground">mm</span>}
                   </div>
@@ -270,8 +270,22 @@ export default function Home() {
               </div>
             ))}
           </form>
+          <section id="results" className="lg:hidden scroll-mt-6">
+            <ScoreSummary
+              formState={formState}
+              uiatsScores={uiatsScores}
+              cardsClassName="grid grid-cols-2 gap-3"
+            />
+          </section>
         </div>
       </div>
+      <a
+        href="#results"
+        className="lg:hidden fixed bottom-4 right-4 z-10 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        View results
+        <ArrowDown className="size-4" />
+      </a>
       {/* Footer */}
       <footer className="bg-gradient-to-br from-sky-50 via-violet-50 to-rose-50 border-t mt-16">
         <div className="max-w-[1200px] mx-auto py-8 px-8 text-center text-muted-foreground">
