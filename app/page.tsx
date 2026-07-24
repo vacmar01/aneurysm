@@ -213,7 +213,7 @@ export default function Home() {
                         <button
                           type="button"
                           aria-label={`More information about ${item.label}`}
-                          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring rounded-full outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                         >
                           <Info className="size-4" />
                         </button>
