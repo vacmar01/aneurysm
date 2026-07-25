@@ -5,6 +5,25 @@ export type UiatsScores = {
   conservative: number;
 };
 
+export type UiatsRecommendation =
+  | "interventional"
+  | "conservative"
+  | "not-definitive";
+
+export function calculateUiatsRecommendation(
+  scores: UiatsScores,
+): UiatsRecommendation {
+  const difference = Math.abs(scores.intervention - scores.conservative);
+
+  if (difference < 3) {
+    return "not-definitive";
+  }
+
+  return scores.intervention > scores.conservative
+    ? "interventional"
+    : "conservative";
+}
+
 // Helper function to get selected values from formState for multiple choice
 function getSelectedValues(formStateValue: string | string[] | number | undefined): string[] {
   if (Array.isArray(formStateValue)) {
