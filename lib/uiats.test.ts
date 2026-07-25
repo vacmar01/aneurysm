@@ -1,12 +1,26 @@
 import { describe, expect, it } from "vitest"
 
-import { calculateUiatsScores } from "./uiats"
+import {
+  calculateUiatsRecommendation,
+  calculateUiatsScores,
+} from "./uiats"
 
 describe("calculateUiatsScores", () => {
   it("returns the UIATS baseline for an empty form", () => {
     expect(calculateUiatsScores({})).toEqual({
       intervention: 0,
       conservative: 5,
+    })
+  })
+
+  describe("recommendation", () => {
+    it.each([
+      [{ intervention: 10, conservative: 10 }, "not-definitive"],
+      [{ intervention: 12, conservative: 10 }, "not-definitive"],
+      [{ intervention: 13, conservative: 10 }, "interventional"],
+      [{ intervention: 10, conservative: 13 }, "conservative"],
+    ])("returns %s as %s", (scores, recommendation) => {
+      expect(calculateUiatsRecommendation(scores)).toBe(recommendation)
     })
   })
 
