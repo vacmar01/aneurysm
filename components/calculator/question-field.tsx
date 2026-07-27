@@ -17,18 +17,18 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { FormItem } from "@/lib/form"
-import type { FormState } from "@/lib/types"
+import type { FormFieldId, FormState } from "@/lib/types"
 
 type QuestionFieldProps = {
   item: FormItem
-  value: FormState[string]
-  onSingleSelect: (itemId: string, value: string) => void
+  value: FormState[FormFieldId]
+  onSingleSelect: (itemId: FormFieldId, value: string) => void
   onMultipleSelect: (
-    itemId: string,
+    itemId: FormFieldId,
     optionValue: string,
     checked: boolean,
   ) => void
-  onNumberInput: (itemId: string, value: string) => void
+  onNumberInput: (itemId: FormFieldId, value: string) => void
 }
 
 export function QuestionField({

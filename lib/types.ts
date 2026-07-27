@@ -1,11 +1,70 @@
-// Defines shared types used across the application, particularly for form state.
+export type Population =
+  | "na_eur_non_finnish"
+  | "japanese"
+  | "finnish"
+  | "inuit"
 
-/**
- * Represents the state of the form.
- * Keys are item IDs (e.g., "age", "riskFactors").
- * Values can be a single string (for single-selects like age or location),
- * an array of strings (for multiple-selects like riskFactors or symptoms),
- * a number (for number inputs like maximumDiameter),
- * or undefined if not set.
- */
-export type FormState = Record<string, string | string[] | number | undefined>; 
+export type RiskFactor =
+  | "sah"
+  | "family"
+  | "smoker"
+  | "hypertension"
+  | "pkd"
+  | "drug_abuse"
+  | "alcohol_abuse"
+
+export type Symptom =
+  | "cn_palsy"
+  | "mass_effect"
+  | "thromboembolic"
+  | "seizures"
+
+export type OtherUiatsFactor =
+  | "fear_rupture"
+  | "multiple_aneurysms"
+
+export type LifeExpectancy = "<5" | "5-10" | ">10"
+
+export type Comorbidity =
+  | "dementia"
+  | "coagulopathy_thrombosis"
+  | "psych_disorders"
+
+export type Morphology =
+  | "irregular_lobulated"
+  | "hw_ratio_gt_1.6"
+
+export type AneurysmLocation =
+  | "basilar_bifurcation"
+  | "vertebral_basilar_other"
+  | "acom_pcom"
+  | "ica"
+  | "mca"
+  | "aca"
+  | "posterior_other"
+
+export type AdditionalFinding =
+  | "growth_over_time"
+  | "denovo_over_time"
+  | "contralateral_stenosis"
+
+export type AneurysmComplexity =
+  | "high_complexity"
+  | "low_complexity"
+
+export type FormState = {
+  age?: number
+  population?: Population
+  riskFactors?: RiskFactor[]
+  symptoms?: Symptom[]
+  otherUiatsFactors?: OtherUiatsFactor[]
+  lifeExpectancy?: LifeExpectancy
+  comorbidity?: Comorbidity[]
+  maximumDiameter?: number
+  morphology?: Morphology[]
+  location?: AneurysmLocation
+  additionalFindings?: AdditionalFinding[]
+  aneurysmComplexity?: AneurysmComplexity
+}
+
+export type FormFieldId = keyof FormState

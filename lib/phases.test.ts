@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 
 import { calculatePhasesScore } from "./phases"
+import type {
+  AneurysmLocation,
+  FormState,
+  Population,
+  RiskFactor,
+} from "./types"
 
 describe("calculatePhasesScore", () => {
   it("returns the baseline for an empty form", () => {
@@ -8,7 +14,7 @@ describe("calculatePhasesScore", () => {
   })
 
   describe("population", () => {
-    it.each([
+    it.each<[Population, number]>([
       ["na_eur_non_finnish", 0],
       ["japanese", 3],
       ["finnish", 5],
@@ -22,7 +28,7 @@ describe("calculatePhasesScore", () => {
   })
 
   describe("hypertension and earlier SAH", () => {
-    it.each([
+    it.each<[RiskFactor[], number]>([
       [["hypertension"], 1],
       [["sah"], 1],
       [["hypertension", "sah"], 2],
@@ -64,7 +70,7 @@ describe("calculatePhasesScore", () => {
   })
 
   describe("site", () => {
-    it.each([
+    it.each<[AneurysmLocation, number]>([
       ["ica", 0],
       ["mca", 2],
       ["aca", 4],
@@ -81,7 +87,7 @@ describe("calculatePhasesScore", () => {
   })
 
   describe("5-year rupture risk", () => {
-    it.each([
+    it.each<[FormState, number, string]>([
       [{}, 0, "0.4%"],
       [{ population: "japanese" }, 3, "0.7%"],
       [{ population: "japanese", age: 70 }, 4, "0.9%"],
@@ -109,12 +115,17 @@ describe("calculatePhasesScore", () => {
   })
 
   it("ignores unknown option values", () => {
-    expect(calculatePhasesScore({
+    const invalidFormState = {
       age: "unknown",
       population: "unknown",
       riskFactors: ["unknown"],
       maximumDiameter: undefined,
       location: "unknown",
-    })).toEqual({ score: 0, risk: "0.4%" })
+    } as unknown as FormState
+
+    expect(calculatePhasesScore(invalidFormState)).toEqual({
+      score: 0,
+      risk: "0.4%",
+    })
   })
 })

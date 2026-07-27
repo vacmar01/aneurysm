@@ -4,6 +4,14 @@ import {
   calculateUiatsRecommendation,
   calculateUiatsScores,
 } from "./uiats"
+import type {
+  AneurysmComplexity,
+  AneurysmLocation,
+  Comorbidity,
+  FormState,
+  LifeExpectancy,
+  Population,
+} from "./types"
 
 describe("calculateUiatsScores", () => {
   it("returns the UIATS baseline for an empty form", () => {
@@ -40,7 +48,7 @@ describe("calculateUiatsScores", () => {
   })
 
   describe("population", () => {
-    it.each([
+    it.each<[Population, number]>([
       ["na_eur_non_finnish", 0],
       ["japanese", 2],
       ["finnish", 2],
@@ -80,7 +88,7 @@ describe("calculateUiatsScores", () => {
       })
     })
 
-    it.each([
+    it.each<[AneurysmLocation, number]>([
       ["basilar_bifurcation", 5],
       ["vertebral_basilar_other", 4],
       ["acom_pcom", 2],
@@ -97,7 +105,7 @@ describe("calculateUiatsScores", () => {
   })
 
   describe("conservative-management factors", () => {
-    it.each([
+    it.each<[LifeExpectancy, number]>([
       ["<5", 4],
       ["5-10", 3],
       [">10", 1],
@@ -108,7 +116,7 @@ describe("calculateUiatsScores", () => {
       })
     })
 
-    it.each([
+    it.each<[Comorbidity, number]>([
       ["dementia", 3],
       ["coagulopathy_thrombosis", 2],
       ["psych_disorders", 2],
@@ -119,7 +127,7 @@ describe("calculateUiatsScores", () => {
       })
     })
 
-    it.each([
+    it.each<[AneurysmComplexity, number]>([
       ["high_complexity", 3],
       ["low_complexity", 0],
     ])("scores aneurysm complexity %s as %s points", (aneurysmComplexity, points) => {
@@ -170,14 +178,16 @@ describe("calculateUiatsScores", () => {
   })
 
   it("ignores unknown option values", () => {
-    expect(calculateUiatsScores({
+    const invalidFormState = {
       age: "unknown",
       population: "unknown",
       riskFactors: ["unknown"],
       symptoms: ["unknown"],
       maximumDiameter: undefined,
       location: "unknown",
-    })).toEqual({
+    } as unknown as FormState
+
+    expect(calculateUiatsScores(invalidFormState)).toEqual({
       intervention: 0,
       conservative: 5,
     })
