@@ -1,4 +1,15 @@
-import { FormState } from "./types"; // Updated path to FormState
+import type {
+  AdditionalFinding,
+  AneurysmComplexity,
+  AneurysmLocation,
+  Comorbidity,
+  FormState,
+  LifeExpectancy,
+  Morphology,
+  OtherUiatsFactor,
+  RiskFactor,
+  Symptom,
+} from "./types";
 
 export type UiatsScores = {
   intervention: number;
@@ -24,42 +35,36 @@ export function calculateUiatsRecommendation(
     : "conservative";
 }
 
-// Helper function to get selected values from formState for multiple choice
-function getSelectedValues(formStateValue: string | string[] | number | undefined): string[] {
-  if (Array.isArray(formStateValue)) {
-    return formStateValue as string[];
-  }
-  return [];
-}
-
 export function calculateUiatsScores(formState: FormState): UiatsScores {
   const scores: UiatsScores = { intervention: 0, conservative: 5 };
 
   // --- Age --- (ID: "age")
-  const ageValue = formState.age as number;
-  if (ageValue < 40) {
-    scores.intervention += 4;
-  } else if (ageValue <= 60) {
-    scores.intervention += 3;
-    scores.conservative += 1;
-  } else if (ageValue <= 70) {
-    scores.intervention += 2;
-    scores.conservative += 3;
-  } else if (ageValue <= 80) {
-    scores.intervention += 1;
-    scores.conservative += 4;
-  } else if (ageValue > 80) {
-    scores.conservative += 5;
+  const ageValue = formState.age;
+  if (ageValue !== undefined) {
+    if (ageValue < 40) {
+      scores.intervention += 4;
+    } else if (ageValue <= 60) {
+      scores.intervention += 3;
+      scores.conservative += 1;
+    } else if (ageValue <= 70) {
+      scores.intervention += 2;
+      scores.conservative += 3;
+    } else if (ageValue <= 80) {
+      scores.intervention += 1;
+      scores.conservative += 4;
+    } else if (ageValue > 80) {
+      scores.conservative += 5;
+    }
   }
 
   // --- Risk Factors --- (ID: "riskFactors", Pro: Intervention)
-  const selectedPopulation = formState.population as string | undefined;
+  const selectedPopulation = formState.population;
   if (selectedPopulation === "japanese" || selectedPopulation === "finnish" || selectedPopulation === "inuit") {
     scores.intervention += 2;
   }
 
-  const selectedRiskFactors = getSelectedValues(formState.riskFactors);
-  const riskFactorPoints: Record<string, number> = {
+  const selectedRiskFactors = formState.riskFactors ?? [];
+  const riskFactorPoints: Record<RiskFactor, number> = {
     "sah": 4,
     "family": 3,
     "smoker": 3,
@@ -73,8 +78,8 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   });
 
   // --- Symptoms --- (ID: "symptoms", Pro: Intervention)
-  const selectedSymptoms = getSelectedValues(formState.symptoms);
-  const symptomPoints: Record<string, number> = {
+  const selectedSymptoms = formState.symptoms ?? [];
+  const symptomPoints: Record<Symptom, number> = {
     "cn_palsy": 4, "mass_effect": 4, "thromboembolic": 3, "seizures": 1,
   };
   selectedSymptoms.forEach(symptom => {
@@ -82,8 +87,8 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   });
 
   // --- Other UIATS Factors --- (ID: "otherUiatsFactors", Pro: Intervention)
-  const selectedOtherFactors = getSelectedValues(formState.otherUiatsFactors);
-  const otherFactorPoints: Record<string, number> = {
+  const selectedOtherFactors = formState.otherUiatsFactors ?? [];
+  const otherFactorPoints: Record<OtherUiatsFactor, number> = {
     "fear_rupture": 2, "multiple_aneurysms": 1,
   };
   selectedOtherFactors.forEach(factor => {
@@ -91,17 +96,17 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   });
 
   // --- Life Expectancy --- (ID: "lifeExpectancy", Pro: Conservative)
-  const lifeExpectancyValue = formState.lifeExpectancy as string | undefined;
+  const lifeExpectancyValue = formState.lifeExpectancy;
   if (lifeExpectancyValue) {
-    const lifeExpectancyMap: Record<string, number> = {
+    const lifeExpectancyMap: Record<LifeExpectancy, number> = {
       "<5": 4, "5-10": 3, ">10": 1,
     };
     scores.conservative += lifeExpectancyMap[lifeExpectancyValue] || 0;
   }
 
   // --- Comorbidity --- (ID: "comorbidity", Pro: Conservative)
-  const selectedComorbidities = getSelectedValues(formState.comorbidity);
-  const comorbidityPoints: Record<string, number> = {
+  const selectedComorbidities = formState.comorbidity ?? [];
+  const comorbidityPoints: Record<Comorbidity, number> = {
     "dementia": 3, "coagulopathy_thrombosis": 2, "psych_disorders": 2,
   };
   selectedComorbidities.forEach(comorbidity => {
@@ -109,7 +114,7 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   });
 
   // --- Maximum Diameter --- (ID: "maximumDiameter")
-  const diameter = formState.maximumDiameter as number | undefined;
+  const diameter = formState.maximumDiameter;
   if (diameter !== undefined) {
     let interventionScore = 0;
     if (diameter <= 3.9) interventionScore = 0;
@@ -128,8 +133,8 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   }
 
   // --- Morphology --- (ID: "morphology", Pro: Intervention)
-  const selectedMorphology = getSelectedValues(formState.morphology);
-  const morphologyPoints: Record<string, number> = {
+  const selectedMorphology = formState.morphology ?? [];
+  const morphologyPoints: Record<Morphology, number> = {
     "irregular_lobulated": 3, "hw_ratio_gt_1.6": 1,
   };
   selectedMorphology.forEach(morph => {
@@ -137,9 +142,9 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   });
 
   // --- Location --- (ID: "location", Pro: Intervention for UIATS, matching image)
-  const locationValue = formState.location as string | undefined;
+  const locationValue = formState.location;
   if (locationValue) {
-    const locationMapIntervention: Record<string, number> = {
+    const locationMapIntervention: Record<AneurysmLocation, number> = {
       "basilar_bifurcation": 5,
       "vertebral_basilar_other": 4,
       "acom_pcom": 2,
@@ -152,8 +157,8 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   }
 
   // --- Additional Findings --- (ID: "additionalFindings", Pro: Intervention)
-  const selectedAdditionalFindings = getSelectedValues(formState.additionalFindings);
-  const additionalFindingPoints: Record<string, number> = {
+  const selectedAdditionalFindings = formState.additionalFindings ?? [];
+  const additionalFindingPoints: Record<AdditionalFinding, number> = {
     "growth_over_time": 4, "denovo_over_time": 3, "contralateral_stenosis": 1,
   };
   selectedAdditionalFindings.forEach(finding => {
@@ -161,9 +166,9 @@ export function calculateUiatsScores(formState: FormState): UiatsScores {
   });
 
   // --- Aneurysm Complexity --- (ID: "aneurysmComplexity", Pro: Conservative)
-  const complexityValue = formState.aneurysmComplexity as string | undefined;
+  const complexityValue = formState.aneurysmComplexity;
   if (complexityValue) {
-    const complexityMap: Record<string, number> = {
+    const complexityMap: Record<AneurysmComplexity, number> = {
       "high_complexity": 3, "low_complexity": 0,
     };
     scores.conservative += complexityMap[complexityValue] || 0;

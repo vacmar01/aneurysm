@@ -5,7 +5,7 @@ import { ArrowDown } from "lucide-react"
 
 import { calculatePhasesScore } from "@/lib/phases"
 import { calculateUiatsScores } from "@/lib/uiats"
-import type { FormState } from "@/lib/types"
+import type { FormFieldId, FormState } from "@/lib/types"
 
 import { Questionnaire } from "./questionnaire"
 import { ScoreSummary } from "./score-summary"
@@ -25,7 +25,7 @@ export default function CalculatorPage() {
   )
   const isEmpty = Object.keys(formState).length === 0
 
-  const handleSingleSelect = (itemId: string, value: string) => {
+  const handleSingleSelect = (itemId: FormFieldId, value: string) => {
     setFormState((previous) => ({
       ...previous,
       [itemId]: value,
@@ -33,7 +33,7 @@ export default function CalculatorPage() {
   }
 
   const handleMultipleSelect = (
-    itemId: string,
+    itemId: FormFieldId,
     optionValue: string,
     checked: boolean,
   ) => {
@@ -54,7 +54,7 @@ export default function CalculatorPage() {
     })
   }
 
-  const handleNumberInput = (itemId: string, value: string) => {
+  const handleNumberInput = (itemId: FormFieldId, value: string) => {
     const numberValue = parseFloat(value)
     setFormState((previous) => ({
       ...previous,

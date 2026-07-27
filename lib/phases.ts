@@ -1,25 +1,15 @@
 // PHASES score calculation based on https://flexikon.doccheck.com/de/PHASES-Score
-// Accepts the formState (Record<string, any>) and returns { score: number, risk: string }
-
-import { FormState } from "./types"; // Updated path to FormState
+import type { FormState } from "./types";
 
 export type PhasesScoreResult = {
   score: number;
   risk: string;
 };
 
-// Helper function to get selected values from formState for multiple choice items
-function getSelectedRiskFactors(formStateValue: string | string[] | number | undefined): string[] {
-  if (Array.isArray(formStateValue)) {
-    return formStateValue as string[];
-  }
-  return [];
-}
-
 export function calculatePhasesScore(formState: FormState): PhasesScoreResult {
   let score = 0;
-  const selectedRiskFactors = getSelectedRiskFactors(formState.riskFactors);
-  const populationValue = formState.population as string | undefined;
+  const selectedRiskFactors = formState.riskFactors ?? [];
+  const populationValue = formState.population;
 
   // 1. Population (P)
   // PHASES: Japanese +3, Finnish +5. Others 0.
@@ -36,13 +26,13 @@ export function calculatePhasesScore(formState: FormState): PhasesScoreResult {
   }
 
   // 3. Age (A) - >=70 years: 1 point
-  const ageValue = formState.age as number;
-  if (ageValue >= 70) {
+  const ageValue = formState.age;
+  if (ageValue !== undefined && ageValue >= 70) {
     score += 1;
   }
 
   // 4. Size of Aneurysm (S) - Diameter in mm
-  const diameter = formState.maximumDiameter as number | undefined;
+  const diameter = formState.maximumDiameter;
   if (diameter !== undefined) {
     if (diameter >= 20) score += 10;
     else if (diameter >= 10 && diameter < 20) score += 6;
@@ -57,7 +47,7 @@ export function calculatePhasesScore(formState: FormState): PhasesScoreResult {
 
   // 6. Site of Aneurysm (S) - Location
   // PHASES: ICA=0, MCA=2, ACA/PCOM/Posterior (all variants)=4
-  const locationValue = formState.location as string | undefined;
+  const locationValue = formState.location;
   if (locationValue === "mca") {
     score += 2;
   } else if (

@@ -1,10 +1,12 @@
+import type { FormFieldId } from "./types"
+
 export type FormOption = {
     label: string;
     value: string; // Represents the actual clinical choice, e.g., "<40", "japanese"
 }
 
 export type FormItem = {
-    id: string;
+    id: FormFieldId;
     label: string;
     description: string;
     tooltip?: string;
