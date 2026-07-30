@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "mise exec node@25 -- next dev --turbopack",
+    "dev": "mise exec node@25 -- next dev --turbopack --hostname 0.0.0.0",
     "build": "mise exec node@25 -- next build",
     "start": "mise exec node@25 -- next start",
     "lint": "mise exec node@25 -- eslint .",
